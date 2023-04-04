@@ -33,27 +33,24 @@ const login = async (req, res) => {
 
     const token = jwt.sign({ id: existingUser.id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRATION,
-    })
-
-    res.status(200).json({
-      message: "Successfully logged in",
-      user: await User.findOne({ email }, "-password"),
-      token: token,
     });
 
-  
-     return res.cookie(String(existingUser.id), token, {
+    res.cookie(String(existingUser.id), token, {
       path: "/",
       expires: new Date(Date.now() + 1000 * 30),
       httpOnly: true,
       sameSite: "lax",
-      secure: true,
+      secure: false,
     });
 
-  
+    return res.status(200).json({
+      message: "Successfully logged in",
+      user: await User.findOne({ email }, "-password"),
+      token: token,
+    });
   } catch (error) {
-    return res.status(500).json({ message: error.message })
+    return res.status(500).json({ message: error.message });
   }
 };
 
-export default login
+export default login;
