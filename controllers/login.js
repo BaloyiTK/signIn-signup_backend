@@ -35,8 +35,14 @@ const login = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRATION,
     })
 
+    res.status(200).json({
+      message: "Successfully logged in",
+      user: await User.findOne({ email }, "-password"),
+      token: token,
+    });
+
   
-    res.cookie(String(existingUser.id), token, {
+     return res.cookie(String(existingUser.id), token, {
       path: "/",
       expires: new Date(Date.now() + 1000 * 30),
       httpOnly: true,
@@ -44,11 +50,7 @@ const login = async (req, res) => {
       secure: true,
     });
 
-    return res.status(200).json({
-      message: "Successfully logged in",
-      user: await User.findOne({ email }, "-password"),
-      token: token,
-    });
+  
   } catch (error) {
     return res.status(500).json({ message: error.message })
   }
